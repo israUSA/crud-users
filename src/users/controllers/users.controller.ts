@@ -1,5 +1,6 @@
 import { Controller, Get, Post, Body, Param, Put, Delete } from '@nestjs/common';
 import { UsersService } from '../services/users.service';
+import { CreateUserWithPostDto } from '../dto/create-user.dto';
 
 @Controller('users')
 export class UsersController {
@@ -28,6 +29,11 @@ export class UsersController {
     @Delete(':id')
     remove(@Param('id') id: number){
         return this.usersService.remove(Number(id));
+    }
+
+    @Post('with-post')
+    createWithPost(@Body() data: CreateUserWithPostDto){
+        return this.usersService.createWithPost(data);
     }
 
 

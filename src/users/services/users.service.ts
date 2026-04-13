@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { User } from '@prisma/client';
 import { PrismaService } from '@src/prisma/prisma.service';
+import { CreateUserWithPostDto } from '../dto/create-user.dto';
 
 @Injectable()
 export class UsersService {
@@ -24,6 +25,30 @@ export class UsersService {
 
   async remove(id:number): Promise<User> {
     return this.prisma.user.delete({where: {id}});
+
+  }
+
+  //transacciones avanzadas
+
+  async createWithPost(data: CreateUserWithPostDto){
+    return this.prisma.$transaction(async (tx) =>{
+        
+        const user = await tx.user.create({
+          data: {
+            name: data.name,
+            email: data.email,
+          },
+        });
+
+        const post = await tx.post.create({
+          data: {
+            title: data.initialPost.title,
+            content: data.initialPost.content,
+            userId: user.id, // Conexión manual por ID
+          },
+        });     
+        return {user, post};
+    })
 
   }
 
